@@ -25,6 +25,10 @@ def getShapeDataFromFile(shape_file):
 # A positive slope m penalizes high reactivities in paired regions, 
 # while a negative intercept b results in a confirmatory `‘bonus’' 
 # free energy for correctly predicted base pairs
+
+#  m= 1.9
+#  b = -0.7
+
 def initialize_fold(sequence_file, output_file, size, shape_file = None, m=None, b=None, hc= None, sc = None):
     with open(sequence_file) as fh:
         sequence = fh.read()
@@ -147,12 +151,15 @@ def concatinate_local_fold(input_file, output_file, size, shape_file = None, m=N
         for i in range(start-length-2):
             seq += '.'
         seq += D[start]
+    out = open('t-RNA/PARANTHESES.FASTA', "w")
+    n = out.write(seq)
+    out.close()
     return(seq)
 
 # res = concatinate_local_fold('cov.fasta',200,'output')
 # res = concatinate_local_fold('t-RNA/shape-seq.fasta', 't-RNA/output-shape.fasta', 50, 't-RNA/shape-react.fasta', 1, -1)
 
-res = concatinate_local_fold('t-RNA/seq_isolat_PS.fasta', 't-RNA/output-covid-shaped.fasta', 50, 't-RNA/Mg_1M7_1_29903.map', 1, -1)
+res = concatinate_local_fold('t-RNA/seq_isolat_PS.fasta', 't-RNA/output-covid-shaped(1).fasta',100, 't-RNA/Mg_1M7_1_29903.map', 1, -1)
 # res = window_fold('cov.fasta',200,'output')
 print(res)
  

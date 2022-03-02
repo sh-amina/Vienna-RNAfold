@@ -8,6 +8,7 @@ def getShapeDataFromFile(filepath):
     with open(filepath, 'r') as f:
         lines = f.readlines()
     for line in lines:
+        print(line)
         pos = int(line.split()[0])
         value = float(line.split()[1])
 
@@ -26,6 +27,7 @@ def getShapeDataFromFile(filepath):
 # free energy for correctly predicted base pairs
 def predict_window_shape(seq_file,shape_file,output_file,size,m,b):
     shape = getShapeDataFromFile(shape_file)
+    print(shape)
     with open(seq_file) as fh:
         sequence = fh.read()
     #
