@@ -20,7 +20,7 @@ import random
 def getShapeDataFromFile(shape_file):
     retVec = []
     retVec.append(-999.0);  # data list is 1-based, so we add smth. at pos 0
-    count=1
+    count = 1
     with open(shape_file, 'r') as f:
         lines = f.readlines()
     for line in lines:
@@ -35,7 +35,7 @@ def getShapeDataFromFile(shape_file):
                 retVec.append(-999.0)
             retVec.append(value)
             count=pos
-        count+=1
+        count += 1
     return retVec
 
 
@@ -151,9 +151,6 @@ def local_fold_list(input_file, output_file, size, shape_file = None, m=None, b=
     file = initialize_fold(input_file, output_file, size, shape_file, m, b)[0] #the function returns (file,sequence)
     # Parse the t-RNA Sequence
     lines = file.readlines()
-    out = open('t-RNA/output_output.fasta', "w")
-    n = out.write(file)
-    out.close()
     d = {}
     for line in lines:
         window = line.split()
@@ -168,7 +165,6 @@ def concatinate_local_fold(input_file, output_file, size, shape_file = None, m=N
     result, sequence = window_fold(input_file, output_file, size, shape_file, m, b) #the function returns (file,sequence)
     # results = [([1, 37], -16.8), ([46, 74], -3.3), ([76, 122], -6.4), ([123, 164], -9.1), ([167, 199], -11.7)]
     seq_len = len(sequence)
-    # print(result)
     D = local_fold_list(input_file, output_file, size, shape_file, m, b)
     # D = {13: '.((((.((((((((((.(.......).))))))........))))..)))).',
     #       2: '.((((..(((((((.....))))))))))).',
