@@ -1,10 +1,9 @@
 # Parse the t-RNA Sequence
-file = open('covid.FASTA', mode = 'r', encoding = 'utf-8-sig')
+file = open('t-RNA/output_trial.FASTA', mode = 'r', encoding = 'utf-8-sig')
 lines = file.readlines()
 seq = []
 for line in lines[1:-2]:
     window = line.split()
-    print(window)
     #window:  ['.(((((.........))))).', '(', '-0.10)', '50']
     # To remove the '-0.10)' parentheses at the end
     window[2] = window[2][:-1]
