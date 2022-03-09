@@ -31,7 +31,12 @@ def getShapeDataFromFile(shape_file):
 
 def initialize_fold(sequence_file, output_file, size, shape_file = None, m=None, b=None, hc= None, sc = None):
     with open(sequence_file) as fh:
-        sequence = fh.read()
+        string = fh.readlines()
+    sequence = ""
+    for line in string[1:]:
+        if line[-1] == "\n":
+            line = line[:-1]
+        sequence += line
 ## preferable, more flexible method: local folding via fold_compound interface
     md = RNA.md()
     md.window_size = size
@@ -54,14 +59,14 @@ def initialize_fold(sequence_file, output_file, size, shape_file = None, m=None,
     with open(output_file,"w") as fh:
         mfe = fc.mfe_window(fh)
     file = open(output_file, mode = 'r', encoding = 'utf-8-sig')
-    return file
+    return(file,sequence)
 
 # x = initialize_fold('t-RNA/shape-seq.fasta', 't-RNA/output-shape.fasta', 50, 't-RNA/shape-react.fasta', 1, -1)
 # print(x)
 
 def window_fold(input_file, output_file, size, shape_file = None, m=None, b=None, hc= None, sc = None):
     # Create and open file
-    file = initialize_fold(input_file, output_file, size, shape_file, m, b)
+    file, sequence = initialize_fold(input_file, output_file, size, shape_file, m, b)#the function returns (file,sequence)
     # Parse the t-RNA Sequence
     lines = file.readlines()
     seq = []
@@ -119,12 +124,12 @@ def window_fold(input_file, output_file, size, shape_file = None, m=None, b=None
     for p in V[temp_min][1]:
         left, right, energy = p[0][0], p[1][0], p[2]
         result.append(([left,right], energy))
-    return result   
+    return(result,sequence) 
 
 
 def local_fold_list(input_file, output_file, size, shape_file = None, m=None, b=None, hc= None, sc = None):
     # Create and open file
-    file = initialize_fold(input_file, output_file, size, shape_file, m, b)
+    file = initialize_fold(input_file, output_file, size, shape_file, m, b)[0] #the function returns (file,sequence)
     # Parse the t-RNA Sequence
     lines = file.readlines()
     d = {}
@@ -138,28 +143,30 @@ def local_fold_list(input_file, output_file, size, shape_file = None, m=None, b=
 
 
 def concatinate_local_fold(input_file, output_file, size, shape_file = None, m=None, b=None, hc= None, sc = None):
-    result = window_fold(input_file, output_file, size, shape_file, m, b)
+    result, sequence = window_fold(input_file, output_file, size, shape_file, m, b) #the function returns (file,sequence)
     # results = [([1, 37], -16.8), ([46, 74], -3.3), ([76, 122], -6.4), ([123, 164], -9.1), ([167, 199], -11.7)]
     D = local_fold_list(input_file, output_file, size, shape_file, m, b)
     # D = {13: '.((((.((((((((((.(.......).))))))........))))..)))).',
     #       2: '.((((..(((((((.....))))))))))).',
     #       1: '(((((.(((((((((.....))))))).))))))).' , etc.}
-    seq = ''
+    sequence += '\n'
     for i in range(len(result)):
         start = result[i][0][0]
-        length = len(seq)
+        length = len(sequence)
         for i in range(start-length-2):
-            seq += '.'
-        seq += D[start]
-    out = open('t-RNA/PARANTHESES.FASTA', "w")
-    n = out.write(seq)
+            sequence += '.'
+        sequence += D[start]
+    output = input_file #set the header
+    output += sequence + "\n"
+    out = open(output_file, "w")
+    n = out.write(output)
     out.close()
-    return(seq)
+    return(output)
 
 # res = concatinate_local_fold('cov.fasta',200,'output')
 # res = concatinate_local_fold('t-RNA/shape-seq.fasta', 't-RNA/output-shape.fasta', 50, 't-RNA/shape-react.fasta', 1, -1)
 
-res = concatinate_local_fold('t-RNA/seq_isolat_PS.fasta', 't-RNA/output-covid-shaped(1).fasta',100, 't-RNA/Mg_1M7_1_29903.map', 1, -1)
+res = concatinate_local_fold('t-RNA/COV.fasta', 't-RNA/COV-output.fasta',100, 't-RNA/Mg_1M7_1_29903.map', 1, -1)
 # res = window_fold('cov.fasta',200,'output')
 print(res)
  
