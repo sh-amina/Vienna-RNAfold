@@ -1,6 +1,21 @@
 import RNA
 import random
 
+#convert .map file to CSV
+# with open("t-RNA/Mg_1M7_1_29903.map") as fh:
+#     lines = fh.readlines()
+# out = open('csv-2.csv','w')
+# for line in lines:
+# 	line = line.split()
+# 	out.write(line[0])
+# 	out.write(',')
+# 	if line[1] == 0:
+# 		out.write('nan')
+# 	else:
+# 		out.write(line[1])
+# 	out.write("\n")
+# 	print(line[0],line[1],line[2])
+
 
 def getShapeDataFromFile(shape_file):
     retVec = []
@@ -23,7 +38,9 @@ def getShapeDataFromFile(shape_file):
         count+=1
     return retVec
 
-# getShapeDataFromFile('t-RNA/Mg_1M7_1_29903.map')
+
+# res = getShapeDataFromFile('t-RNA/Mg_1M7_1_29903.map')
+# print(res)
 # A positive slope m penalizes high reactivities in paired regions, 
 # while a negative intercept b results in a confirmatory `‘bonus’' 
 # free energy for correctly predicted base pairs
@@ -134,6 +151,9 @@ def local_fold_list(input_file, output_file, size, shape_file = None, m=None, b=
     file = initialize_fold(input_file, output_file, size, shape_file, m, b)[0] #the function returns (file,sequence)
     # Parse the t-RNA Sequence
     lines = file.readlines()
+    out = open('t-RNA/output_output.fasta', "w")
+    n = out.write(file)
+    out.close()
     d = {}
     for line in lines:
         window = line.split()
@@ -148,6 +168,7 @@ def concatinate_local_fold(input_file, output_file, size, shape_file = None, m=N
     result, sequence = window_fold(input_file, output_file, size, shape_file, m, b) #the function returns (file,sequence)
     # results = [([1, 37], -16.8), ([46, 74], -3.3), ([76, 122], -6.4), ([123, 164], -9.1), ([167, 199], -11.7)]
     seq_len = len(sequence)
+    # print(result)
     D = local_fold_list(input_file, output_file, size, shape_file, m, b)
     # D = {13: '.((((.((((((((((.(.......).))))))........))))..)))).',
     #       2: '.((((..(((((((.....))))))))))).',
@@ -156,16 +177,17 @@ def concatinate_local_fold(input_file, output_file, size, shape_file = None, m=N
     for i in range(len(result)):
         start = result[i][0][0]
         if i == 0:
-            for j in range(start):
+            for j in range(start-1):
                 sequence += '.'
         end = start+len(D[start])
         if i != len(result)-1:
             next = result[i+1][0][0]
+        sequence += D[start]
         for j in range(next-end):
             sequence += '.'
-        sequence += D[start]
+        
         if i == len(result)-1:
-            for j in range(end,seq_len):
+            for j in range(end,seq_len+1):
                 sequence += '.'
     output = ">"+ input_file + "\n" #set the header
     output += sequence + "\n"
@@ -178,11 +200,12 @@ def concatinate_local_fold(input_file, output_file, size, shape_file = None, m=N
 # res = concatinate_local_fold('t-RNA/shape-seq.fasta', 't-RNA/output-shape.fasta', 50, 't-RNA/shape-react.fasta', 1, -1)
 #  m= 1.9
 #  b = -0.7
-res = concatinate_local_fold('t-RNA/seq_isolat_PS.fasta', 't-RNA/COVID-250.lfold.chain',250, 't-RNA/Mg_1M7_1_29903.map', 1.9, -0.7)
-
+# res = concatinate_local_fold('t-RNA/sequence.fasta', 'browser files/sequence.lfold.chain', 20)
+res = concatinate_local_fold('t-RNA/seq_isolat_PS.fasta', 'browser files/COVID-300.lfold.chain',300,'t-RNA/Mg_1M7_1_29903.map', 1.9,-0.7)
+# res = concatinate_local_fold('t-RNA/seq_isolat_PS.fasta', 'browser files/COVID-300-noshape.lfold.chain',300)
 # res = concatinate_local_fold('t-RNA/sequence.fasta', 't-RNA/sequence-out.lfold.chain',20)
 # res = window_fold('cov.fasta',200,'output')
-print(res)
+# print(res)
  
 
 # print('Heya')

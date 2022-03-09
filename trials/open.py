@@ -72,8 +72,11 @@ def check(myStr):
   
 # Driver code
 # with open('browser files/example files for the SARS structure genome browser/1M7_Mg-L300-D-full_genome.lfold.chain') as fh:
-with open('t-RNA/COVID-200.lfold.chain') as fh:
+with open('t-RNA/COVID-250.lfold.chain') as fh:
     sequence = fh.readlines()
+# with open('t-RNA/COVID-250.lfold.chain') as fh:
+#     sequence1 = fh.readlines()
+
 string = sequence[1]
 print("len seq", len(sequence[1]))
 
