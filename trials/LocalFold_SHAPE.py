@@ -1,5 +1,6 @@
 import RNA
 import random
+import pandas as pd
 
 def getShapeFromCSV(csv_file):
     retVec = []
@@ -199,6 +200,7 @@ def concatinate_local_fold(input_file, output_file, size, shape_file = None, sha
     #       1: '(((((.(((((((((.....))))))).))))))).' , etc.}
     sequence += '\n'
     next = 1
+    energy = 0
     for i in range(len(result)):
         start = result[i][0][0]
         if i == 0:
@@ -214,12 +216,56 @@ def concatinate_local_fold(input_file, output_file, size, shape_file = None, sha
         if i == len(result)-1:
             for j in range(end,seq_len+1):
                 sequence += '.'
+        energy += result[i][1]
     output = ">"+ input_file + "\n" #set the header
-    output += sequence + "\n"
+    output += sequence + " ("
+    output +=  str(energy) + ") \n"
     out = open(output_file, "w")
     n = out.write(output)
     out.close()
     return(output)
+
+def similarity(input_1, input_2):
+    with open(input_1, 'r') as fp:
+        seq_1 = fp.readlines()[2]
+    with open(input_2, 'r') as fp:
+        seq_2 = fp.readlines()[2]
+    yes = 0
+    count = 0
+    for i, c in enumerate(seq_1):
+        if c == ' ':
+            break
+        if c == seq_2[i]:
+            yes += 1
+        count += 1
+    percentage = f"{100*(yes/count):.2f}%"
+    return percentage
+
+def SHAPE_similarity(input_chain, input_csv):
+    df = pd.read_csv (input_csv, header=None, names=["index", "value"])
+    df = df.dropna()
+    all = df.size
+    df = df[df["value"] > 1.5]
+    print(df)
+    threshold = df["index"].tolist()
+    with open(input_chain, 'r') as fp:
+        seq = fp.readlines()[2]
+    count = len(threshold)
+    yes = 0
+    for index in threshold:
+        if seq[index-1] == '.':
+            yes += 1
+    percentage = f"{100*(yes/count):.2f}%"
+    return percentage
+
+# res = similarity('COVID-200.lfold.chain', 'average-200.lfold.chain')
+res = SHAPE_similarity('browser files/COVID-200.lfold.chain', 'full1.csv')
+print(res)
+
+
+
+
+
 
 # res = concatinate_local_fold('cov700.fasta', 'merge.lfold.chain', 100, ('cov1.csv','cov2.csv') , 1.9, -0.7)
 
